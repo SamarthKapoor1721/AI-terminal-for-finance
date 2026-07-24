@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html,
+body {
+  background-color: #0a0a0b;
+  color: #e6e7ea;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slim scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0b;
+}
+::-webkit-scrollbar-thumb {
+  background: #26282e;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3d44;
+}
+
+@layer components {
+  .panel {
+    @apply bg-terminal-panel border border-terminal-border rounded-lg;
+  }
+  /* Subtle title bar across the top of a panel */
+  .panel-header {
+    @apply flex items-center justify-between gap-2 border-b border-terminal-border px-4 py-2.5 text-sm font-medium text-terminal-text;
+  }
+  .stat-label {
+    @apply text-xs font-medium text-terminal-muted;
+  }
+  .stat-value {
+    @apply font-mono text-2xl font-semibold text-terminal-text;
+  }
+  /* Page heading */
+  .page-title {
+    @apply text-2xl font-semibold tracking-tight text-terminal-text;
+  }
+  /* Shimmering placeholder while data loads */
+  .skeleton {
+    @apply inline-block rounded bg-terminal-border/60;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+  }
+  /* Data tables: sans labels, mono numbers via .num */
+  .data-table {
+    @apply w-full text-sm;
+  }
+  .data-table thead tr {
+    @apply border-b border-terminal-border text-left text-xs font-medium uppercase tracking-wide text-terminal-muted;
+  }
+  .data-table th {
+    @apply px-4 py-2.5;
+  }
+  .data-table td {
+    @apply px-4 py-2.5;
+  }
+  .data-table tbody tr {
+    @apply border-b border-terminal-border/40 transition-colors hover:bg-white/[0.03];
+  }
+  /* Numeric cells: tabular mono digits */
+  .num {
+    @apply font-mono tabular-nums;
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ---- Landing page effects ---- */
+
+/* faint grid backdrop, like a trading terminal */
+.grid-bg {
+  background-image:
+    linear-gradient(#ffffff08 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* amber radial glow behind the hero */
+.hero-glow {
+  background: radial-gradient(
+    600px circle at 50% 0%,
+    rgba(255, 176, 0, 0.12),
+    transparent 70%
+  );
+}
+
+/* scrolling ticker tape */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ffb000 0%, #ffd700 50%, #ff8c00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

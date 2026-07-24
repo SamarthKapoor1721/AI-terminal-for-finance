@@ -1,0 +1,11 @@
+# Reverse proxy + automatic HTTPS for the VPS deploy (docker-compose.prod.yml).
+# Replace the two domains below with yours, point their DNS A records at the
+# server, and Caddy fetches Let's Encrypt certs automatically on first request.
+
+app.example.com {
+	reverse_proxy frontend:3000
+}
+
+api.example.com {
+	reverse_proxy backend:8000
+}

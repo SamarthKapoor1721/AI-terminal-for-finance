@@ -1,0 +1,55 @@
+# --- Web framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic[email]==2.10.4
+pydantic-settings==2.7.1
+python-multipart==0.0.20
+
+# --- Auth ---
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
+python-jose[cryptography]==3.3.0
+
+# --- Database ---
+sqlalchemy==2.0.36
+psycopg[binary]==3.2.3
+alembic==1.14.0
+
+# --- Async tasks / cache ---
+celery==5.4.0
+redis==5.2.1
+
+# --- Market & financial data ---
+yfinance>=1.4.1   # older pins (0.2.x) break against Yahoo's current API / rate limits
+pandas==2.2.3
+numpy==2.2.1
+
+# --- AI: sentiment (FinBERT) + embeddings (bge) ---
+# CPU torch keeps the image lean; swap for CUDA build if you have a GPU.
+torch==2.5.1
+transformers==4.47.1
+sentence-transformers==3.3.1
+
+# --- RAG: vector store ---
+chromadb>=1.0.0,<2.0.0
+# LLM access is via plain HTTP (see app/services/llm.py using httpx).
+# When implementing the Phase 12 LangGraph multi-agent system, add:
+#   langchain, langchain-community, langchain-ollama, ollama
+# (pin httpx<0.28 then, since the ollama client caps it).
+
+# --- Document parsing (transcripts / filings) ---
+pypdf==5.1.0
+
+# --- Reports (Phase 8 PDF export) ---
+reportlab==4.2.5
+
+# --- Economic data (Phase 11, optional) ---
+fredapi==0.5.2
+
+# --- Geo risk heatmap (NER country extraction) ---
+spacy==3.8.7  # >=3.8.5 ships prebuilt linux/arm64 wheels (3.8.3 compiles from source)
+pycountry==24.6.1
+
+# --- Utils ---
+httpx==0.28.1
+tenacity==9.0.0

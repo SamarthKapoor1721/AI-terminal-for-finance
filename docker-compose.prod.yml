@@ -1,0 +1,75 @@
+# Production compose for a single VPS (Oracle Always-Free ARM VM, Hetzner, etc.).
+# Differences from the dev docker-compose.yml:
+#   - no Celery worker / Redis (nothing dispatches tasks — verified unused)
+#   - no published DB port (Postgres stays on the internal network)
+#   - no source bind-mounts / --reload (image is self-contained)
+#   - Caddy terminates TLS and reverse-proxies (auto HTTPS via Let's Encrypt)
+#
+# Usage on the server:
+#   1. copy repo + a filled-in .env (see DEPLOY.md)
+#   2. edit Caddyfile with your domain
+#   3. docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finance}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a strong POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-finance}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finance}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    image: finance-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+      LLM_MODE: groq
+      HF_HOME: /data/hf-cache
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - aidata:/data
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      # NEXT_PUBLIC_* is inlined at build time, so the API URL must be a build arg
+      args:
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL to your https api domain}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    command: npm run start
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  pgdata:
+  aidata:
+  caddy_data:
+  caddy_config:
