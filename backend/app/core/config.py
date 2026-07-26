@@ -1,6 +1,5 @@
 from functools import lru_cache
 
-from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -55,16 +54,15 @@ class Settings(BaseSettings):
     # SEC EDGAR requires a descriptive User-Agent (no key). Set to your email.
     SEC_USER_AGENT: str = "AI Bloomberg Terminal contact@example.com"
 
-    # CORS. Accepts a comma-separated string in env (e.g.
-    # "https://my-app.vercel.app,https://foo.com") or a JSON list.
-    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    # CORS. Comma-separated string in env, e.g.
+    # "https://my-app.vercel.app,https://foo.com". Kept as a plain str field
+    # (not list[str]) because pydantic-settings tries json.loads() on complex
+    # env fields before any validator runs, which breaks on a bare comma list.
+    CORS_ORIGINS: str = "http://localhost:3000"
 
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def _split_cors(cls, v):
-        if isinstance(v, str) and not v.strip().startswith("["):
-            return [o.strip() for o in v.split(",") if o.strip()]
-        return v
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
 
     @property
     def sqlalchemy_url(self) -> str:
