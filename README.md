@@ -172,15 +172,12 @@ ollama pull qwen3:8b
 
 # 4. Start the whole platform (first run takes a few minutes to build)
 docker compose up --build
-
-# 5. In a SECOND terminal, create a ready-made demo account
-docker compose exec backend python -m scripts.seed
 ```
 
 ### Open it
 - 🌐 **The app:** http://localhost:3000
 - 📖 **API documentation:** http://localhost:8000/docs
-- 🔑 **Demo login:** `demo@terminal.ai` / `demo12345`
+- 🔑 **Account:** open http://localhost:3000/register and create one (tables are created automatically on first boot)
 
 > **First AI request is slow** because it downloads the FinBERT/embedding models (~1.5 GB, one time) and the local language model is CPU-bound. Everything else (prices, charts, portfolio) is instant.
 
@@ -201,9 +198,8 @@ cp .env.example .env                         # 2. create your config (once)
 ollama serve &                               # 3. start local AI
 ollama pull qwen3:8b                          #    download the model (once, ~5 GB)
 docker compose up --build                     # 4. build + start everything
-docker compose exec backend python -m scripts.seed   # 5. (new terminal) demo account
 ```
-Then open **http://localhost:3000** · login `demo@terminal.ai` / `demo12345`.
+Then open **http://localhost:3000** and create an account at `/register`.
 
 ### Everyday use (after the first build)
 | Goal | Command |
@@ -215,7 +211,6 @@ Then open **http://localhost:3000** · login `demo@terminal.ai` / `demo12345`.
 | See what's running | `docker compose ps` |
 | Watch backend logs | `docker compose logs -f backend` |
 | Watch frontend logs | `docker compose logs -f frontend` |
-| Re-seed the demo account | `docker compose exec backend python -m scripts.seed` |
 | Open a shell in the backend | `docker compose exec backend bash` |
 
 ### After changing things
@@ -297,7 +292,6 @@ FInance/
 │   │       ├── reports, earnings, agents             # AI features
 │   │       ├── llm.py        # smart Groq/Ollama switching
 │   │       └── providers/    # swappable data sources (yfinance/Finnhub/FMP)
-│   └── scripts/seed.py       # creates the demo account
 └── frontend/                 # Next.js app (TypeScript)
     ├── app/                  # one folder per page
     ├── components/           # reusable UI (sidebar, charts, cards)

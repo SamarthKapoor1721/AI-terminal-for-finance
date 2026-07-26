@@ -12,12 +12,29 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const mismatch = confirm.length > 0 && confirm !== password;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+    if (!/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
+      setError("Password must contain at least one letter and one number");
+      return;
+    }
+
     setBusy(true);
     try {
       await register(email, name, password);
@@ -75,6 +92,20 @@ export default function RegisterPage() {
               </div>
             )}
 
+            <AuthField
+              label="Confirm password"
+              type="password"
+              value={confirm}
+              onChange={setConfirm}
+              placeholder="Re-enter your password"
+              minLength={8}
+              autoComplete="new-password"
+            />
+
+            {mismatch && (
+              <p className="text-xs text-terminal-red">Passwords do not match</p>
+            )}
+
             {error && (
               <div className="flex items-center gap-2 rounded-md border border-terminal-red/40 bg-terminal-red/10 px-3 py-2 text-sm text-terminal-red">
                 <AlertCircle size={15} /> {error}
@@ -83,7 +114,7 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={busy}
+              disabled={busy || mismatch}
               className="flex w-full items-center justify-center gap-2 rounded-md bg-terminal-amber py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {busy ? "Creating…" : "Create account"}

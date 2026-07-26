@@ -28,3 +28,4 @@ chroma/
 .idea/
 .vscode/
 .claude/
+frontend/tsconfig.tsbuildinfo

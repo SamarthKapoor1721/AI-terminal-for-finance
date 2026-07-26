@@ -27,11 +27,6 @@ export default function LoginPage() {
     }
   }
 
-  function useDemo() {
-    setEmail("demo@terminal.ai");
-    setPassword("demo12345");
-  }
-
   return (
     <div className="flex min-h-screen bg-terminal-bg">
       <AuthShowcase />
@@ -83,13 +78,6 @@ export default function LoginPage() {
               {!busy && <ArrowRight size={16} />}
             </button>
           </form>
-
-          <button
-            onClick={useDemo}
-            className="mt-3 w-full rounded-md border border-terminal-border py-2.5 text-sm text-terminal-muted transition-colors hover:border-terminal-amber hover:text-terminal-text"
-          >
-            Use demo account
-          </button>
 
           <p className="mt-8 text-center text-sm text-terminal-muted">
             New here?{" "}

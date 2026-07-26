@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _get_user_by_email(db: Session, email: str) -> User | None:
-    return db.scalar(select(User).where(User.email == email))
+    return db.scalar(select(User).where(User.email == email.strip().lower()))
 
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
@@ -27,7 +28,12 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> Token:
         password_hash=hash_password(payload.password),
     )
     db.add(user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # Two concurrent signups for the same email; the unique index won.
+        db.rollback()
+        raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
     db.refresh(user)
 
     token = create_access_token(user.id)

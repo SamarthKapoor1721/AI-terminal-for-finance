@@ -23,7 +23,9 @@ Best for a demo/portfolio. $0, no credit card. Caveat: the free Space **sleeps a
 ### 1. Database — Neon (free)
 1. Create a project at neon.tech → copy the connection string.
 2. Convert the driver prefix: `postgresql://…` → `postgresql+psycopg://…`
-   Keep it for `DATABASE_URL` below.
+   Also drop the `&channel_binding=require` parameter if Neon included it — keep
+   `?sslmode=require`. Use the **pooler** host for serverless/short-lived connections.
+   Keep the result for `DATABASE_URL` below.
 
 ### 2. Backend — Hugging Face Spaces (free, 16 GB RAM)
 1. Push this repo to GitHub (`git remote add origin … && git push -u origin main`).
@@ -71,15 +73,13 @@ Best if you don't want sleeping. Oracle's Always-Free ARM VM (4 cores / 24 GB RA
 
 ## After first deploy (either option)
 
-Seed the demo user against the production DB:
-```bash
-# Option A: run locally with DATABASE_URL pointed at Neon
-# Option B: docker compose -f docker-compose.prod.yml exec backend python -m scripts.seed
-```
-Login: `demo@terminal.ai` / `demo12345` (change it for anything public).
+Nothing to seed. The backend runs `init_db()` on startup, so tables are created
+automatically on first boot. Open the frontend and create your account at
+`/register` — the first person to register is just a normal user.
 
 ## Security checklist before going public
 - [ ] `SECRET_KEY` is a fresh long random string (not the dev value)
 - [ ] `CORS_ORIGINS` is your real frontend domain, not `*` or localhost
 - [ ] DB password is strong (VPS) / DB is the managed instance (free)
-- [ ] Consider disabling `/docs` or the open `register` endpoint for a public demo
+- [ ] Consider disabling `/docs` for a public deployment
+- [ ] Rotate the Neon password if the connection string was ever pasted into a chat, terminal history, or commit
