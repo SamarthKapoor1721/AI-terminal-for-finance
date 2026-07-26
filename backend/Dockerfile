@@ -13,7 +13,7 @@ COPY requirements.txt .
 # The cache mount keeps downloaded wheels (~2GB: torch, spacy, …) on the host
 # between builds, so re-running this layer resolves from disk, not the network.
 # The cpu wheel index keeps torch CUDA-free on x86 builds (no-op on arm64).
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
     pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
