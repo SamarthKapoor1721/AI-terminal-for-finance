@@ -1,8 +1,9 @@
 // Thin typed client for the FastAPI backend. Token is kept in localStorage
 // (fine for a local terminal; use httpOnly cookies for real deployments).
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+).replace(/\/+$/, "");
 
 const TOKEN_KEY = "abt_token";
 
